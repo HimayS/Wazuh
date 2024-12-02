@@ -1,0 +1,9 @@
+to Install Ubuntu: wsl --install
+
+https://github.com/LpCodes/Moving-WSL-Distribution-to-Another-Drive
+
+wsl -t Ubuntu
+wsl --export Ubuntu "E:WSL\wsl_export\ubuntu-ex.tar"
+wsl --unregister Ubuntu
+wsl --import Ubuntu "E:WSL\wsl_import\ubuntu" "E:WSL\wsl_export\ubuntu-ex.tar"
+ubuntu.exe config --default-user hs

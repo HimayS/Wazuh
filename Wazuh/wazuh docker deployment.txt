@@ -1,0 +1,70 @@
+0> clone wazuh-docker repo
+git clone https://github.com/wazuh/wazuh-docker.git
+git checkout origin/4.9.0
+
+
+1>wazuh-manager
+
+-> wazuh-manager source code:
+git clone https://github.com/wazuh/wazuh.git
+cd wazuh
+git checkout origin/4.9.0
+
+1.1> generate wazuh rpm package using your source code
+
+-> use wazuh-package generation tool
+git clone https://github.com/wazuh/wazuh-packages.git
+cd wazuh-packages && git checkout origin/4.9.0 
+
+-> read wazuh-package generation guide for more info @
+https://documentation.wazuh.com/current/development/packaging/generate-rpm-package.html
+
+-> below command needs docker. it will first create docker image which will run container automatically to generate package.
+
+cd wazuh-packages/rpms
+./generate_rpm_package.sh -b 4.9.0 --packages-branch 4.9.0 -t manager -a x86_64  --sources <full path to wazuh source dir>
+
+-> it will generate rpm package in output folder of current directory.
+
+
+1.2> use rpm package in wazuh-docker
+
+do: copy wazuh-manager.rpm package in wazuh-docker/build-docker-images/wazuh-manager folder
+
+COPY wazuh-manager-4.9.0-1.x86_64.rpm .
+RUN yum install wazuh-manager-4.9.0-1.x86_64.rpm -y
+
+at line no.65 or before EXPOSE 55000/tcp 1514/tcp 1515/tcp 514/udp 1516/tcp add: RUN rm wazuh-manager-4.9.0-1.x86_64.rpm
+
+
+2>wazuh-indexer
+
+
+
+
+3>wazuh-dashboard
+
+
+
+final step: create docker images for manager/indexer/dashboard
+
+1> run below command from root dir. of wazuh-docker
+
+buil-docker-images/build-images.sh
+
+2> generate certificates
+refer this: https://documentation.wazuh.com/current/deployment-options/docker/wazuh-container.html
+
+cd wazuh-docker/single-node
+docker-compose -f generate-indexer-certs.yml run --rm generator
+
+3> modify wazuh-docker/single-node/docker-compose.yml
+
+line no.78: change appropriate port you want to use instead of 443
+- 5601:5601
+
+4> run below command to start wazuh in docker from single-node directory
+docker-compose up -d
+
+
+

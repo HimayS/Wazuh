@@ -1,0 +1,94 @@
+Wazuh in WSL-Ubuntu
+
+
+1>to install wazuh-manager 
+
+sudo apt update
+sudo apt-get install build-essential -y
+sudo apt install cmake -y
+
+git clone https://github.com/wazuh/wazuh.git
+
+cd wazuh
+git checkout origin/4.9.0
+
+cd src
+1.	make deps TARGET=server -j4  #uses 4 cores of cpu
+2.	make TARGET=server -j4
+
+	cd ..   #wazuh root folder  
+3.	sudo ./install.sh
+
+
+
+2>build indexer
+
+git clone https://github.com/wazuh/wazuh-indexer.git
+cd wazuh-indexer
+git checkout origin/4.9.0
+
+
+install jdk 17: sudo apt install openjdk-17-jdk-headless -y 
+
+
+	./gradlew localDistro   //builds for your local system
+	./gradlew assemble      //build + docker image
+
+note: run this command after your dashboard+plugins bootstraping is complete
+sudo sysctl -w vm.max_map_count=262144  //set this before run
+	
+	./gradlew run
+
+
+
+
+3>wazuh-dashboard
+
+	git clone https://github.com/wazuh/wazuh-dashboard.git
+	git checkout origin/4.9.0
+
+
+
+	cd wazuh-dashboard
+install nvm: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+	nvm install v18.19.0  #igonre .nvmrc file 
+	npm i -g corepack     #it might not work for node-v18.16.0 described in .nvmrc file
+	corepack install      #it adds yarn folder to the .cache folder
+
+
+1.	yarn osd bootstrap          #builds the dashbaord
+2.	yarn opensearch snapshot    #starts the opensearch indexer
+3.	yarn start                  #run this command is separate terminal
+
+
+
+
+3.1> add plugins in dashboard
+
+	git clone https://github.com/wazuh/wazuh-dashboard-plugins.git
+	git checkout origin/4.9.0
+
+Do: copy all the folders from the plugins folder of the wazuh-dashboard-plugins
+    to the plugins folder of the wazuh-dashboard
+
+
+
+3.2> cd wazuh-dashboard
+
+1.	yarn osd bootstrap          #builds the dashbaords
+error: while bootstraping mutiple version of dependency found error will arise...
+	 so manually update package.json file of plugins folder accordingly
+	with lower version of package.
+
+note: start wazuh-indexer with ./gradlew run before starting the dashboard in separate terminal
+2.	yarn start
+
+note: connection error with indexer at 127.0.0.1:9200 may arise, if insufficient memory
+
+
+
+#read DEVELOPER_GUIDE.md(for indexer and dashboard) available in source code folder for more info.
+#indexer run at: localhost:9200
+#dashbaord run at: localhost:5603
+

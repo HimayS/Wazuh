@@ -1,0 +1,40 @@
+sudo apt update
+sudo apt-get install build-essential -y
+sudo apt install openjdk-17-jdk-headless -y 
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget -y
+
+
+1> install python
+curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+pyenv install 3.9.17
+
+do:
+note: after installing, manually set environment variable as they describe in terminal.
+	also set pyenv env.var. line to use pyenv automatically
+
+pip install pipenv   //to install python dependency
+
+
+
+2> install cmake
+sudo apt-get install build-essential
+wget http://www.cmake.org/files/v3.23/cmake-3.23.1.tar.gz
+tar xf cmake-3.23.1.tar.gz
+
+cd cmake-3.23.1
+./configure
+gmake -j4  //j4 means it uses 4 cores of cpu.
+# Then to install it to your system finally do 
+sudo make install 
+
+# Do this to refresh your console 
+hash -r
+
+# Then finally check with
+cmake --version
+
+
+
+3> opensearch build tool
+git clone https://github.com/opensearch-project/opensearch-build.git
+git checkout 2.11.1
